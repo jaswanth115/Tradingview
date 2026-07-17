@@ -115,8 +115,3 @@ export function filterSymbols(symbols: string[], query: string): string[] {
   if (!trimmed) return source;
   return source.filter((symbol) => symbol.includes(trimmed));
 }
-
-/** TradingView accepts dotted share classes like BRK.B / BF.B. */
-export function toTradingViewSymbol(symbol: string): string {
-  return symbol;
-}

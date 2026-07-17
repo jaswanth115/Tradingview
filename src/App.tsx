@@ -38,7 +38,7 @@ export default function App() {
     setMobileOpen(false);
   }, []);
 
-  const handleToggleLock = useCallback(() => {
+  const handleToggleEdit = useCallback(() => {
     if (canEdit) {
       lock();
       return;
@@ -58,46 +58,22 @@ export default function App() {
     focusTrapRef,
   });
 
+  const watchlistProps = {
+    activeList,
+    counts,
+    symbols,
+    selectedSymbol,
+    query,
+    canEdit,
+    onQueryChange: setQuery,
+    onListChange: setActiveList,
+    onSelectSymbol: selectSymbol,
+    onMoveSymbol: move,
+    onToggleEdit: handleToggleEdit,
+  };
+
   return (
     <div className="app-shell" ref={focusTrapRef} tabIndex={-1}>
-      <header className="topbar">
-        <div className="topbar-brand">
-          <span className="topbar-dot" aria-hidden="true" />
-          <span>S&P 500 Desk</span>
-        </div>
-        <div className="topbar-symbol">
-          {selectedSymbol ? (
-            <>
-              <span className="topbar-ticker">{selectedSymbol}</span>
-              <span className="topbar-meta">NASDAQ · 1h</span>
-            </>
-          ) : (
-            <span className="topbar-meta">Select a symbol</span>
-          )}
-        </div>
-        <div className="topbar-actions">
-          <button
-            type="button"
-            className={`topbar-lock${canEdit ? ' is-unlocked' : ''}`}
-            onClick={handleToggleLock}
-            title={
-              canEdit
-                ? 'Editing is unlocked — click to lock'
-                : 'Read-only — click to unlock editing with your PIN'
-            }
-          >
-            {canEdit ? 'Editing' : 'Read-only'}
-          </button>
-          <button
-            type="button"
-            className="mobile-watchlist-toggle"
-            onClick={() => setMobileOpen(true)}
-          >
-            Watchlist
-          </button>
-        </div>
-      </header>
-
       <main className="workspace">
         <div className="chart-stage">
           {selectedSymbol ? (
@@ -108,21 +84,19 @@ export default function App() {
               <p>Switch lists or move a ticker here to open a chart.</p>
             </div>
           )}
+
+          <button
+            type="button"
+            className="mobile-watchlist-fab"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open watchlist"
+          >
+            Watchlist
+          </button>
         </div>
 
         <div className="desktop-watchlist">
-          <WatchlistPanel
-            activeList={activeList}
-            counts={counts}
-            symbols={symbols}
-            selectedSymbol={selectedSymbol}
-            query={query}
-            canEdit={canEdit}
-            onQueryChange={setQuery}
-            onListChange={setActiveList}
-            onSelectSymbol={selectSymbol}
-            onMoveSymbol={move}
-          />
+          <WatchlistPanel {...watchlistProps} />
         </div>
       </main>
 
@@ -130,16 +104,7 @@ export default function App() {
         <div className="mobile-drawer-overlay" onClick={() => setMobileOpen(false)}>
           <div onClick={(event) => event.stopPropagation()}>
             <WatchlistPanel
-              activeList={activeList}
-              counts={counts}
-              symbols={symbols}
-              selectedSymbol={selectedSymbol}
-              query={query}
-              canEdit={canEdit}
-              onQueryChange={setQuery}
-              onListChange={setActiveList}
-              onSelectSymbol={selectSymbol}
-              onMoveSymbol={move}
+              {...watchlistProps}
               isMobileDrawer
               onCloseMobile={() => setMobileOpen(false)}
             />

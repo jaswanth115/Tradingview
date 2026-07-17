@@ -13,6 +13,7 @@ type WatchlistPanelProps = {
   onListChange: (id: WatchlistId) => void;
   onSelectSymbol: (symbol: string) => void;
   onMoveSymbol: (symbol: string, to: WatchlistId) => void;
+  onToggleEdit: () => void;
   onCloseMobile?: () => void;
   isMobileDrawer?: boolean;
 };
@@ -28,6 +29,7 @@ export function WatchlistPanel({
   onListChange,
   onSelectSymbol,
   onMoveSymbol,
+  onToggleEdit,
   onCloseMobile,
   isMobileDrawer = false,
 }: WatchlistPanelProps) {
@@ -40,16 +42,30 @@ export function WatchlistPanel({
           <p className="watchlist-eyebrow">Watchlist</p>
           <h1 className="watchlist-title">{meta.shortLabel}</h1>
         </div>
-        {isMobileDrawer && onCloseMobile ? (
+        <div className="watchlist-header-actions">
           <button
             type="button"
-            className="watchlist-drawer-close"
-            onClick={onCloseMobile}
-            aria-label="Close watchlist"
+            className={`watchlist-lock${canEdit ? ' is-unlocked' : ''}`}
+            onClick={onToggleEdit}
+            title={
+              canEdit
+                ? 'Editing unlocked — click to lock'
+                : 'Read-only — click to unlock with PIN'
+            }
           >
-            Close
+            {canEdit ? 'Editing' : 'Read-only'}
           </button>
-        ) : null}
+          {isMobileDrawer && onCloseMobile ? (
+            <button
+              type="button"
+              className="watchlist-drawer-close"
+              onClick={onCloseMobile}
+              aria-label="Close watchlist"
+            >
+              Close
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <WatchlistTabs
@@ -99,8 +115,8 @@ export function WatchlistPanel({
 
       <p className="watchlist-hint">
         {canEdit
-          ? 'Use ↑ / ↓ to change the chart · editing unlocked'
-          : 'Use ↑ / ↓ to change the chart · read-only'}
+          ? 'Use arrow keys or space to change chart symbol'
+          : 'Use arrow keys or space to change chart symbol · read-only'}
       </p>
     </aside>
   );

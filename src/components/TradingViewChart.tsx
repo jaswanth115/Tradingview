@@ -1,5 +1,8 @@
-import { useEffect, useId, useRef } from 'react';
-import { toTradingViewSymbol } from '../services/watchlistService';
+﻿import { useEffect, useId, useRef } from 'react';
+import {
+  getSymbolExchange,
+  toTradingViewSymbol,
+} from '../services/symbolExchangeService';
 
 const SCRIPT_ID = 'tradingview-widget-script';
 const SCRIPT_SRC = 'https://s3.tradingview.com/tv.js';
@@ -34,6 +37,8 @@ function ensureTradingViewScript(onReady: () => void): () => void {
 export function TradingViewChart({ symbol }: TradingViewChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const containerId = useId().replace(/:/g, '');
+  const chartSymbol = toTradingViewSymbol(symbol);
+  const exchange = getSymbolExchange(symbol);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,7 +50,7 @@ export function TradingViewChart({ symbol }: TradingViewChartProps) {
 
       new window.TradingView.widget({
         autosize: true,
-        symbol: toTradingViewSymbol(symbol),
+        symbol: chartSymbol,
         interval: '60',
         timezone: 'America/New_York',
         theme: 'dark',
@@ -69,10 +74,16 @@ export function TradingViewChart({ symbol }: TradingViewChartProps) {
       cancelled = true;
       cleanup();
     };
-  }, [symbol, containerId]);
+  }, [chartSymbol, containerId]);
 
   return (
     <section className="chart-pane" aria-label={`${symbol} chart`}>
+      {exchange ? (
+        <div className="chart-exchange-badge">
+          <span className="chart-exchange-label">Exchange</span>
+          <span className="chart-exchange-value">{exchange}</span>
+        </div>
+      ) : null}
       <div id={containerId} ref={containerRef} className="chart-container" />
     </section>
   );
