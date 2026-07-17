@@ -5,6 +5,7 @@ type SymbolRowProps = {
   symbol: string;
   currentList: WatchlistId;
   isSelected: boolean;
+  canEdit: boolean;
   onSelect: (symbol: string) => void;
   onMove: (symbol: string, to: WatchlistId) => void;
 };
@@ -13,6 +14,7 @@ export function SymbolRow({
   symbol,
   currentList,
   isSelected,
+  canEdit,
   onSelect,
   onMove,
 }: SymbolRowProps) {
@@ -28,7 +30,9 @@ export function SymbolRow({
   return (
     <li
       ref={rowRef}
-      className={`symbol-row${isSelected ? ' is-selected' : ''}`}
+      className={`symbol-row${isSelected ? ' is-selected' : ''}${
+        canEdit ? '' : ' is-locked'
+      }`}
     >
       <button
         type="button"
@@ -41,19 +45,21 @@ export function SymbolRow({
         <span className="symbol-hint">{isSelected ? 'Active' : 'Open'}</span>
       </button>
 
-      <div className="symbol-actions" aria-label={`Move ${symbol}`}>
-        {destinations.map((id) => (
-          <button
-            key={id}
-            type="button"
-            className={`symbol-move symbol-move--${id}`}
-            onClick={() => onMove(symbol, id)}
-            title={`Move to ${WATCHLIST_META[id].label}`}
-          >
-            {id === 'triggered' ? 'Trig' : id === 'bought' ? 'Buy' : 'S&P'}
-          </button>
-        ))}
-      </div>
+      {canEdit ? (
+        <div className="symbol-actions" aria-label={`Move ${symbol}`}>
+          {destinations.map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={`symbol-move symbol-move--${id}`}
+              onClick={() => onMove(symbol, id)}
+              title={`Move to ${WATCHLIST_META[id].label}`}
+            >
+              {id === 'triggered' ? 'Trig' : id === 'bought' ? 'Buy' : 'S&P'}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </li>
   );
 }

@@ -3,6 +3,7 @@ import { TradingViewChart } from './components/TradingViewChart';
 import { WatchlistPanel } from './components/WatchlistPanel';
 import { useSymbolNavigation } from './hooks/useSymbolNavigation';
 import { useWatchlists } from './hooks/useWatchlists';
+import { useEditMode } from './hooks/useEditMode';
 
 export default function App() {
   const {
@@ -14,6 +15,8 @@ export default function App() {
     counts,
     move,
   } = useWatchlists();
+
+  const { canEdit, unlock, lock } = useEditMode();
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,6 +37,19 @@ export default function App() {
     setSelectedSymbol(symbol);
     setMobileOpen(false);
   }, []);
+
+  const handleToggleLock = useCallback(() => {
+    if (canEdit) {
+      lock();
+      return;
+    }
+
+    const pin = window.prompt('Enter PIN to enable editing:');
+    if (pin === null) return;
+    if (!unlock(pin.trim())) {
+      window.alert('Incorrect PIN. Editing stays locked.');
+    }
+  }, [canEdit, lock, unlock]);
 
   useSymbolNavigation({
     symbols,
@@ -59,13 +75,27 @@ export default function App() {
             <span className="topbar-meta">Select a symbol</span>
           )}
         </div>
-        <button
-          type="button"
-          className="mobile-watchlist-toggle"
-          onClick={() => setMobileOpen(true)}
-        >
-          Watchlist
-        </button>
+        <div className="topbar-actions">
+          <button
+            type="button"
+            className={`topbar-lock${canEdit ? ' is-unlocked' : ''}`}
+            onClick={handleToggleLock}
+            title={
+              canEdit
+                ? 'Editing is unlocked — click to lock'
+                : 'Read-only — click to unlock editing with your PIN'
+            }
+          >
+            {canEdit ? 'Editing' : 'Read-only'}
+          </button>
+          <button
+            type="button"
+            className="mobile-watchlist-toggle"
+            onClick={() => setMobileOpen(true)}
+          >
+            Watchlist
+          </button>
+        </div>
       </header>
 
       <main className="workspace">
@@ -87,6 +117,7 @@ export default function App() {
             symbols={symbols}
             selectedSymbol={selectedSymbol}
             query={query}
+            canEdit={canEdit}
             onQueryChange={setQuery}
             onListChange={setActiveList}
             onSelectSymbol={selectSymbol}
@@ -104,6 +135,7 @@ export default function App() {
               symbols={symbols}
               selectedSymbol={selectedSymbol}
               query={query}
+              canEdit={canEdit}
               onQueryChange={setQuery}
               onListChange={setActiveList}
               onSelectSymbol={selectSymbol}

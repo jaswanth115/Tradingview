@@ -132,9 +132,51 @@ button {
   font-size: 0.78rem;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.topbar-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.topbar-lock::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.topbar-lock:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.topbar-lock.is-unlocked {
+  color: var(--accent-green);
+  border-color: rgba(38, 166, 154, 0.4);
+}
+
+.topbar-lock.is-unlocked::before {
+  background: var(--accent-green);
+}
+
 .mobile-watchlist-toggle {
   display: none;
-  margin-left: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -321,6 +363,10 @@ button {
   align-items: center;
   padding: 0 0.35rem;
   position: relative;
+}
+
+.symbol-row.is-locked {
+  grid-template-columns: 1fr;
 }
 
 .symbol-row.is-selected::before {

@@ -8,6 +8,7 @@ type WatchlistPanelProps = {
   symbols: string[];
   selectedSymbol: string | null;
   query: string;
+  canEdit: boolean;
   onQueryChange: (value: string) => void;
   onListChange: (id: WatchlistId) => void;
   onSelectSymbol: (symbol: string) => void;
@@ -22,6 +23,7 @@ export function WatchlistPanel({
   symbols,
   selectedSymbol,
   query,
+  canEdit,
   onQueryChange,
   onListChange,
   onSelectSymbol,
@@ -70,7 +72,7 @@ export function WatchlistPanel({
 
       <div className="watchlist-columns" aria-hidden="true">
         <span>Symbol</span>
-        <span>Move</span>
+        <span>{canEdit ? 'Move' : ''}</span>
       </div>
 
       <ul className="symbol-list" role="listbox" aria-label={meta.label}>
@@ -87,6 +89,7 @@ export function WatchlistPanel({
               symbol={symbol}
               currentList={activeList}
               isSelected={symbol === selectedSymbol}
+              canEdit={canEdit}
               onSelect={onSelectSymbol}
               onMove={onMoveSymbol}
             />
@@ -94,7 +97,11 @@ export function WatchlistPanel({
         )}
       </ul>
 
-      <p className="watchlist-hint">Use ↑ / ↓ to change the chart symbol</p>
+      <p className="watchlist-hint">
+        {canEdit
+          ? 'Use ↑ / ↓ to change the chart · editing unlocked'
+          : 'Use ↑ / ↓ to change the chart · read-only'}
+      </p>
     </aside>
   );
 }
