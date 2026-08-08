@@ -15,9 +15,9 @@ const UNIVERSE_BY_DESK: Record<DeskId, readonly string[]> = {
   ftmo: FTMO_SYMBOLS,
 };
 
-const SYMBOL_SET_BY_DESK: Record<DeskId, Set<string>> = {
-  sp500: new Set(SP500_SYMBOLS),
-  ftmo: new Set(FTMO_SYMBOLS),
+const CANONICAL_BY_DESK: Record<DeskId, Map<string, string>> = {
+  sp500: new Map(SP500_SYMBOLS.map((symbol) => [symbol.toUpperCase(), symbol])),
+  ftmo: new Map(FTMO_SYMBOLS.map((symbol) => [symbol.toUpperCase(), symbol])),
 };
 
 function sortSymbols(symbols: string[]): string[] {
@@ -43,16 +43,19 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }
 
+function canonicalizeSymbol(desk: DeskId, symbol: string): string | null {
+  return CANONICAL_BY_DESK[desk].get(symbol.trim().toUpperCase()) ?? null;
+}
+
 function sanitizeDeskList(desk: DeskId, symbols: string[]): string[] {
-  const allowed = SYMBOL_SET_BY_DESK[desk];
   const seen = new Set<string>();
   const result: string[] = [];
 
   for (const symbol of symbols) {
-    const normalized = symbol.trim().toUpperCase();
-    if (!allowed.has(normalized) || seen.has(normalized)) continue;
-    seen.add(normalized);
-    result.push(normalized);
+    const canonical = canonicalizeSymbol(desk, symbol);
+    if (!canonical || seen.has(canonical)) continue;
+    seen.add(canonical);
+    result.push(canonical);
   }
 
   return sortSymbols(result);
@@ -183,19 +186,19 @@ export function moveSymbol(
   symbol: string,
   to: BucketId,
 ): WatchlistsState {
-  const allowed = SYMBOL_SET_BY_DESK[desk];
-  if (!allowed.has(symbol)) return state;
+  const canonical = canonicalizeSymbol(desk, symbol);
+  if (!canonical) return state;
 
   const deskState = state[desk];
-  const from = findBucketForSymbol(deskState, symbol);
+  const from = findBucketForSymbol(deskState, canonical);
   if (from === to) return state;
 
   const nextDesk: DeskState = {
-    universe: deskState.universe.filter((item) => item !== symbol),
-    triggered: deskState.triggered.filter((item) => item !== symbol),
-    bought: deskState.bought.filter((item) => item !== symbol),
+    universe: deskState.universe.filter((item) => item !== canonical),
+    triggered: deskState.triggered.filter((item) => item !== canonical),
+    bought: deskState.bought.filter((item) => item !== canonical),
   };
-  nextDesk[to] = sortSymbols([...nextDesk[to], symbol]);
+  nextDesk[to] = sortSymbols([...nextDesk[to], canonical]);
 
   return {
     ...state,
@@ -211,7 +214,7 @@ export function filterSymbols(symbols: string[], query: string): string[] {
   const trimmed = query.trim().toUpperCase();
   const source = sortSymbols(symbols);
   if (!trimmed) return source;
-  return source.filter((symbol) => symbol.includes(trimmed));
+  return source.filter((symbol) => symbol.toUpperCase().includes(trimmed));
 }
 
 export function getMoveDestinations(currentBucket: BucketId): BucketId[] {
