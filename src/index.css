@@ -263,11 +263,53 @@ button {
   font-size: 0.8rem;
 }
 
+.desk-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.65rem 0.55rem 0.15rem;
+}
+
+.desk-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.5rem 0.55rem;
+  text-align: left;
+}
+
+.desk-tab:hover {
+  background: var(--bg-row-hover);
+  color: var(--text);
+}
+
+.desk-tab.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--text);
+}
+
+.desk-tab-label {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.desk-tab-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
 .watchlist-tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.25rem;
-  padding: 0.65rem 0.55rem 0.25rem;
+  padding: 0.45rem 0.55rem 0.25rem;
 }
 
 .watchlist-tab {
@@ -295,8 +337,12 @@ button {
 }
 
 .watchlist-tab-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .watchlist-tab-count {
@@ -445,7 +491,7 @@ button {
   border-color: rgba(255, 255, 255, 0.28);
 }
 
-.symbol-move--sp500:hover {
+.symbol-move--universe:hover {
   color: var(--sp500);
   background: var(--sp500-dim);
   border-color: rgba(38, 166, 154, 0.35);

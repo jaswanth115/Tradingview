@@ -496,5 +496,10 @@
   "POOL": "NASDAQ",
   "CAG": "NYSE",
   "CPB": "NASDAQ",
-  "EPAM": "NYSE"
+  "EPAM": "NYSE",
+  "ARM": "NASDAQ",
+  "SNOW": "NYSE",
+  "ASML": "NASDAQ",
+  "GME": "NYSE",
+  "MSTR": "NASDAQ"
 }

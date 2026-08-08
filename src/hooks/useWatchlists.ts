@@ -5,43 +5,74 @@ import {
   moveSymbol,
   saveWatchlists,
 } from '../services/watchlistService';
-import type { WatchlistId, WatchlistsState } from '../types/watchlist';
+import type {
+  BucketId,
+  DeskId,
+  WatchlistsState,
+} from '../types/watchlist';
 
 export function useWatchlists() {
   const [state, setState] = useState<WatchlistsState>(() => loadWatchlists());
-  const [activeList, setActiveList] = useState<WatchlistId>('sp500');
+  const [activeDesk, setActiveDesk] = useState<DeskId>('sp500');
+  const [activeBucket, setActiveBucket] = useState<BucketId>('universe');
   const [query, setQuery] = useState('');
 
   useEffect(() => {
     saveWatchlists(state);
   }, [state]);
 
-  const move = useCallback((symbol: string, to: WatchlistId) => {
-    setState((prev) => moveSymbol(prev, symbol, to));
+  const setDesk = useCallback((desk: DeskId) => {
+    setActiveDesk(desk);
+    setActiveBucket('universe');
+    setQuery('');
   }, []);
 
+  const move = useCallback(
+    (symbol: string, to: BucketId) => {
+      setState((prev) => moveSymbol(prev, activeDesk, symbol, to));
+    },
+    [activeDesk],
+  );
+
   const symbols = useMemo(
-    () => filterSymbols(state[activeList], query),
-    [state, activeList, query],
+    () => filterSymbols(state[activeDesk][activeBucket], query),
+    [state, activeDesk, activeBucket, query],
   );
 
   const counts = useMemo(
     () => ({
-      sp500: state.sp500.length,
-      triggered: state.triggered.length,
-      bought: state.bought.length,
+      universe: state[activeDesk].universe.length,
+      triggered: state[activeDesk].triggered.length,
+      bought: state[activeDesk].bought.length,
+    }),
+    [state, activeDesk],
+  );
+
+  const deskCounts = useMemo(
+    () => ({
+      sp500:
+        state.sp500.universe.length +
+        state.sp500.triggered.length +
+        state.sp500.bought.length,
+      ftmo:
+        state.ftmo.universe.length +
+        state.ftmo.triggered.length +
+        state.ftmo.bought.length,
     }),
     [state],
   );
 
   return {
     state,
-    activeList,
-    setActiveList,
+    activeDesk,
+    setActiveDesk: setDesk,
+    activeBucket,
+    setActiveBucket,
     query,
     setQuery,
     symbols,
     counts,
+    deskCounts,
     move,
   };
 }

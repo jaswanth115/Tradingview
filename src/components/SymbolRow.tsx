@@ -1,25 +1,29 @@
 import { useEffect, useRef } from 'react';
-import { WATCHLIST_IDS, WATCHLIST_META, type WatchlistId } from '../types/watchlist';
+import {
+  getBucketLabel,
+  getMoveDestinations,
+} from '../services/watchlistService';
+import { BUCKET_META, type BucketId } from '../types/watchlist';
 
 type SymbolRowProps = {
   symbol: string;
-  currentList: WatchlistId;
+  currentBucket: BucketId;
   isSelected: boolean;
   canEdit: boolean;
   onSelect: (symbol: string) => void;
-  onMove: (symbol: string, to: WatchlistId) => void;
+  onMove: (symbol: string, to: BucketId) => void;
 };
 
 export function SymbolRow({
   symbol,
-  currentList,
+  currentBucket,
   isSelected,
   canEdit,
   onSelect,
   onMove,
 }: SymbolRowProps) {
   const rowRef = useRef<HTMLLIElement>(null);
-  const destinations = WATCHLIST_IDS.filter((id) => id !== currentList);
+  const destinations = getMoveDestinations(currentBucket);
 
   useEffect(() => {
     if (isSelected && rowRef.current) {
@@ -53,9 +57,9 @@ export function SymbolRow({
               type="button"
               className={`symbol-move symbol-move--${id}`}
               onClick={() => onMove(symbol, id)}
-              title={`Move to ${WATCHLIST_META[id].label}`}
+              title={`Move to ${BUCKET_META[id].label}`}
             >
-              {id === 'triggered' ? 'Trig' : id === 'bought' ? 'Buy' : 'S&P'}
+              {getBucketLabel(id)}
             </button>
           ))}
         </div>

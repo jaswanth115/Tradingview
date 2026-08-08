@@ -1,46 +1,59 @@
+import { DeskSwitcher } from './DeskSwitcher';
 import { WatchlistTabs } from './WatchlistTabs';
 import { SymbolRow } from './SymbolRow';
-import { WATCHLIST_META, type WatchlistId } from '../types/watchlist';
+import {
+  BUCKET_META,
+  DESK_META,
+  type BucketId,
+  type DeskId,
+} from '../types/watchlist';
 
 type WatchlistPanelProps = {
-  activeList: WatchlistId;
-  counts: Record<WatchlistId, number>;
+  activeDesk: DeskId;
+  activeBucket: BucketId;
+  deskCounts: Record<DeskId, number>;
+  counts: Record<BucketId, number>;
   symbols: string[];
   selectedSymbol: string | null;
   query: string;
   canEdit: boolean;
+  onDeskChange: (desk: DeskId) => void;
   onQueryChange: (value: string) => void;
-  onListChange: (id: WatchlistId) => void;
+  onBucketChange: (id: BucketId) => void;
   onSelectSymbol: (symbol: string) => void;
-  onMoveSymbol: (symbol: string, to: WatchlistId) => void;
+  onMoveSymbol: (symbol: string, to: BucketId) => void;
   onToggleEdit: () => void;
   onCloseMobile?: () => void;
   isMobileDrawer?: boolean;
 };
 
 export function WatchlistPanel({
-  activeList,
+  activeDesk,
+  activeBucket,
+  deskCounts,
   counts,
   symbols,
   selectedSymbol,
   query,
   canEdit,
+  onDeskChange,
   onQueryChange,
-  onListChange,
+  onBucketChange,
   onSelectSymbol,
   onMoveSymbol,
   onToggleEdit,
   onCloseMobile,
   isMobileDrawer = false,
 }: WatchlistPanelProps) {
-  const meta = WATCHLIST_META[activeList];
+  const deskMeta = DESK_META[activeDesk];
+  const bucketMeta = BUCKET_META[activeBucket];
 
   return (
     <aside className={`watchlist-panel${isMobileDrawer ? ' is-drawer' : ''}`}>
       <div className="watchlist-header">
         <div className="watchlist-heading">
           <p className="watchlist-eyebrow">Watchlist</p>
-          <h1 className="watchlist-title">{meta.shortLabel}</h1>
+          <h1 className="watchlist-title">{deskMeta.shortLabel}</h1>
         </div>
         <div className="watchlist-header-actions">
           <button
@@ -68,10 +81,16 @@ export function WatchlistPanel({
         </div>
       </div>
 
+      <DeskSwitcher
+        activeDesk={activeDesk}
+        counts={deskCounts}
+        onChange={onDeskChange}
+      />
+
       <WatchlistTabs
-        activeList={activeList}
+        activeBucket={activeBucket}
         counts={counts}
-        onChange={onListChange}
+        onChange={onBucketChange}
       />
 
       <label className="watchlist-search">
@@ -91,7 +110,11 @@ export function WatchlistPanel({
         <span>{canEdit ? 'Move' : ''}</span>
       </div>
 
-      <ul className="symbol-list" role="listbox" aria-label={meta.label}>
+      <ul
+        className="symbol-list"
+        role="listbox"
+        aria-label={`${deskMeta.label} · ${bucketMeta.label}`}
+      >
         {symbols.length === 0 ? (
           <li className="symbol-empty">
             {query.trim()
@@ -103,7 +126,7 @@ export function WatchlistPanel({
             <SymbolRow
               key={symbol}
               symbol={symbol}
-              currentList={activeList}
+              currentBucket={activeBucket}
               isSelected={symbol === selectedSymbol}
               canEdit={canEdit}
               onSelect={onSelectSymbol}

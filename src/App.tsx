@@ -7,12 +7,15 @@ import { useEditMode } from './hooks/useEditMode';
 
 export default function App() {
   const {
-    activeList,
-    setActiveList,
+    activeDesk,
+    setActiveDesk,
+    activeBucket,
+    setActiveBucket,
     query,
     setQuery,
     symbols,
     counts,
+    deskCounts,
     move,
   } = useWatchlists();
 
@@ -59,14 +62,17 @@ export default function App() {
   });
 
   const watchlistProps = {
-    activeList,
+    activeDesk,
+    activeBucket,
+    deskCounts,
     counts,
     symbols,
     selectedSymbol,
     query,
     canEdit,
+    onDeskChange: setActiveDesk,
     onQueryChange: setQuery,
-    onListChange: setActiveList,
+    onBucketChange: setActiveBucket,
     onSelectSymbol: selectSymbol,
     onMoveSymbol: move,
     onToggleEdit: handleToggleEdit,

@@ -1,17 +1,36 @@
-export const WATCHLIST_IDS = ['sp500', 'triggered', 'bought'] as const;
+export const DESK_IDS = ['sp500', 'ftmo'] as const;
+export const BUCKET_IDS = ['universe', 'triggered', 'bought'] as const;
 
-export type WatchlistId = (typeof WATCHLIST_IDS)[number];
+export type DeskId = (typeof DESK_IDS)[number];
+export type BucketId = (typeof BUCKET_IDS)[number];
 
-export type WatchlistsState = Record<WatchlistId, string[]>;
+export type DeskState = Record<BucketId, string[]>;
+export type WatchlistsState = Record<DeskId, DeskState>;
 
-export const WATCHLIST_META: Record<
-  WatchlistId,
+export const DESK_META: Record<
+  DeskId,
   { label: string; shortLabel: string; description: string }
 > = {
   sp500: {
-    label: 'All S&P 500',
+    label: 'S&P 500',
     shortLabel: 'S&P 500',
-    description: 'Full S&P 500 universe',
+    description: 'S&P 500 trading desk',
+  },
+  ftmo: {
+    label: 'FTMO',
+    shortLabel: 'FTMO',
+    description: 'FTMO trading desk',
+  },
+};
+
+export const BUCKET_META: Record<
+  BucketId,
+  { label: string; shortLabel: string; description: string }
+> = {
+  universe: {
+    label: 'All Symbols',
+    shortLabel: 'All',
+    description: 'Full desk universe',
   },
   triggered: {
     label: 'Triggered',
@@ -25,4 +44,4 @@ export const WATCHLIST_META: Record<
   },
 };
 
-export const STORAGE_KEY = 'sp500-watchlists-v1';
+export const STORAGE_KEY = 'sp500-watchlists-v3';
